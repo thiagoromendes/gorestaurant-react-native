@@ -59,7 +59,10 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     async function loadFoods(): Promise<void> {
-      // Load Foods from API
+      await api.get('/foods').then(response => {
+        setFoods(response.data)
+      });
+
     }
 
     loadFoods();
@@ -67,7 +70,9 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     async function loadCategories(): Promise<void> {
-      // Load categories from API
+      api.get('/categories').then(response => {
+        setCategories(response.data)
+      })
     }
 
     loadCategories();
