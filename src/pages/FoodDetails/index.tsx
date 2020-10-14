@@ -74,37 +74,73 @@ const FoodDetails: React.FC = () => {
 
   useEffect(() => {
     async function loadFood(): Promise<void> {
-      const response = await api.get('/foods')
+      const {id} = routeParams;
+      const response = await api.get(`/foods/${id}`);
+      const getFood = {...response.data, formattedPrice:formatValue(response.data.price)}
+      const getExtras = getFood.extras.map(item => {
+        return {
+          id: item.id,
+          name: item.name,
+          value: formatValue(item.value),
+          quantity: 0,
+        }
+      })
 
-      const indexFood = response.data.findIndex(item => item.category === routeParams.id)
-      const getFood = response.data[indexFood]
-
-
-      console.log(indexFood);
       setFood(getFood);
+      setExtras(getExtras)
     }
 
     loadFood();
   }, [routeParams]);
 
   function handleIncrementExtra(id: number): void {
-    // Increment extra quantity
+    const incrementExtra = extras.map(item => {
+      if (item.id === id){
+        return {
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity + 1,
+          value: item.value,
+        }
+      } else {
+        return {...item}
+      }
+
+    })
+    setExtras(incrementExtra)
+
   }
 
   function handleDecrementExtra(id: number): void {
-    // Decrement extra quantity
+    const decrementExtra = extras.map(item => {
+      if (item.id === id && item.quantity > 0){
+        return {
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity - 1,
+          value: item.value,
+        }
+      } else {
+        return {...item}
+      }
+
+    })
+    setExtras(decrementExtra)
   }
 
   function handleIncrementFood(): void {
-    // Increment food quantity
+    setFoodQuantity(foodQuantity + 1)
   }
 
   function handleDecrementFood(): void {
-    // Decrement food quantity
+    if(foodQuantity > 1) {
+      setFoodQuantity(foodQuantity - 1)
+    }
   }
 
   const toggleFavorite = useCallback(() => {
     // Toggle if food is favorite or not
+    setIsFavorite(state => !state)
   }, [isFavorite, food]);
 
   const cartTotal = useMemo(() => {
