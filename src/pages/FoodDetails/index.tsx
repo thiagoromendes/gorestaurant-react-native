@@ -38,6 +38,7 @@ import {
   ButtonText,
   IconContainer,
 } from './styles';
+import { resolvePreset } from '@babel/core';
 
 interface Params {
   id: number;
@@ -73,7 +74,14 @@ const FoodDetails: React.FC = () => {
 
   useEffect(() => {
     async function loadFood(): Promise<void> {
-      // Load a specific food with extras based on routeParams id
+      const response = await api.get('/foods')
+
+      const indexFood = response.data.findIndex(item => item.category === routeParams.id)
+      const getFood = response.data[indexFood]
+
+
+      console.log(indexFood);
+      setFood(getFood);
     }
 
     loadFood();
