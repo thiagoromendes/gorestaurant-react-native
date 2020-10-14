@@ -76,18 +76,13 @@ const FoodDetails: React.FC = () => {
     async function loadFood(): Promise<void> {
       const {id} = routeParams;
       const response = await api.get(`/foods/${id}`);
-      const getFood = {...response.data, formattedPrice:formatValue(response.data.price)}
-      const getExtras = getFood.extras.map(item => {
-        return {
-          id: item.id,
-          name: item.name,
-          value: formatValue(item.value),
-          quantity: 0,
-        }
-      })
 
-      setFood(getFood);
-      setExtras(getExtras)
+      setFood({...response.data, formattedPrice: formatValue(response.data.price)});
+
+      setExtras(response.data.extras.map((extra: Omit<Extra, 'quantity'>) => ({
+        ...extra,
+        quantity: 0
+      })))
     }
 
     loadFood();
@@ -145,6 +140,9 @@ const FoodDetails: React.FC = () => {
 
   const cartTotal = useMemo(() => {
     // Calculate cartTotal
+    const totalExtras = extras.reduce((total, item) => total + (item.value * item.quantity), 0 )
+    const totalFood = food.price * foodQuantity
+    return formatValue(totalExtras + totalFood)
   }, [extras, food, foodQuantity]);
 
   async function handleFinishOrder(): Promise<void> {
